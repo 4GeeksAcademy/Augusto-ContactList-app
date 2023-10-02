@@ -1,4 +1,4 @@
-import { exampleStore, exampleActions } from "./exampleStore.js"; //destructured import
+import { exampleStore, exampleActions } from "./exampleStore.js"; 
 import { usuarioStore, usuarioActions } from "./usuario.js";
 import { contactStore, contactActions } from "./contact.js";
 

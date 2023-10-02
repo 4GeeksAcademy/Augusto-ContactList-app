@@ -3,6 +3,7 @@ import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 
 const Contactos = () => {
+    const [showForm, setShowForm] = useState(false);
     const { store, actions } = useContext(Context)
     const [nombre, setNombre] = useState("")
     const [email, setEmail] = useState("")
@@ -11,8 +12,42 @@ const Contactos = () => {
     const [lista, setLista] = useState(store.listaContactos)
     const [refresh, setRefresh] = useState(false)
     const [estadoTemporal, setEstadotemporal] = useState({})
+    const [data, setData] = useState({
+        full_name: "",
+        email: "",
+        address: "",
+        phone: ""
+    })
+    const handleEditClick = () => {
+        setShowForm(true);
+    };
+    const handleSaveClick = async () => {
+        try {
+          await actions.addContact(data);
+    
+          setShowForm(false);
+          setData({
+            full_name: "",
+            address: "",
+            phone: "",
+            email: "",
+          });
+        } catch (error) {
+          console.error("Error al guardar los datos:", error);
+        }
+      };
+    
+      const handleCancelClick = () => {
+        setShowForm(false);
+        setData({
+          full_name: "",
+          address: "",
+          phone: "",
+          email: "",
+        });
+      };
 
-    useEffect(() => { 
+    useEffect(() => {
         let funcionCarga = async () => {
             actions.funcionCarga()
         }
@@ -43,32 +78,69 @@ const Contactos = () => {
                                         </div>
                                         <div className="col-6">
                                             <h3 className="mb-3">{item.full_name}</h3>
-                                            <p className="text-white"><i class="fas fa-map-marker-alt text-secondary"></i><span className="ms-3">{item.address}</span></p>
-                                            <p className="text-white"><i class="fas fa-at text-secondary"></i><span className="ms-3">{item.email}</span></p>
-                                            <p className="text-white"><i class="fas fa-phone text-secondary"></i><span className="ms-3">{item.phone}</span></p>
+                                            <p className="text-white"><i className="fas fa-map-marker-alt text-secondary"></i><span className="ms-3">{item.address}</span></p>
+                                            <p className="text-white"><i className="fas fa-at text-secondary"></i><span className="ms-3">{item.email}</span></p>
+                                            <p className="text-white"><i className="fas fa-phone text-secondary"></i><span className="ms-3">{item.phone}</span></p>
                                         </div>
                                         <div className="col-2 d-flex align-items-center justify-content-end">
                                             <button
                                                 className="btn btn-lg text-success m-2"
-                                                button="button"
-                                                onClick={() => {
-                                                    console.log(item.full_name);
-                                                    const nombrePrompt = prompt("Enter new name:", item["full_name"]);
-                                                    const emailPrompt = prompt("Enter new email:", item.email);
-                                                    const phonePrompt = prompt("Enter new phone number:", item.phone);
-                                                    const addressPrompt = prompt("Enter new address:", item.address);
-                                                    let obj = {
-                                                        "full_name": nombrePrompt,
-                                                        "email": emailPrompt,
-                                                        "agenda_slug": "",
-                                                        "address": addressPrompt,
-                                                        "phone": phonePrompt
-                                                    }
-                                                    actions.putFetch(item.id, obj);
-                                                }}
+                                                onClick={handleEditClick}
                                             >
-                                                <i class="fas fa-pencil-alt"></i>
+                                                <i className="fas fa-pencil-alt"></i>
                                             </button>
+                                            {showForm && (
+                                                <div>
+                                                    <div>
+                                                        Full Name
+                                                        <input
+                                                            className="border mt-2 border-none"
+                                                            placeholder="Full Name"
+                                                            name="full_name"
+                                                            required
+                                                            value={data.full_name}
+                                                            onChange={(e) => setData({ ...data, full_name: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        Address
+                                                        <input
+                                                            className="border mt-2 border-none"
+                                                            placeholder="Enter Address"
+                                                            name="address"
+                                                            required
+                                                            value={data.address}
+                                                            onChange={(e) => setData({ ...data, address: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        Phone Number
+                                                        <input
+                                                            className="border mt-2 border-none"
+                                                            placeholder="Enter Phone"
+                                                            name="phone"
+                                                            type="tel"
+                                                            required
+                                                            value={data.phone}
+                                                            onChange={(e) => setData({ ...data, phone: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        Email
+                                                        <input
+                                                            className="border mt-2 border-none"
+                                                            placeholder="Enter Email"
+                                                            name="email"
+                                                            type="email"
+                                                            required
+                                                            value={data.email}
+                                                            onChange={(e) => setData({ ...data, email: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <button onClick={handleSaveClick}>Save</button>
+                                                    <button onClick={handleCancelClick}>Cancel</button>
+                                                </div>
+                                            )}
                                             <button
                                                 className="btn btn-lg m-2 text-danger"
                                                 type="button"
@@ -81,7 +153,7 @@ const Contactos = () => {
                                                     }
                                                 }}
                                             >
-                                                <i class="fas fa-trash"></i>
+                                                <i className="fas fa-trash"></i>
                                             </button>
 
                                         </div>
@@ -90,9 +162,9 @@ const Contactos = () => {
                             })
                         ) : (
                             <div className="text-center py-3">
-                                <i class="fas fa-sad-tear fa-lg"></i>
+                                <i className="fas fa-sad-tear fa-lg"></i>
                                 This Contact List Is Empty
-                                <i class="fas fa-sad-tear fa-lg"></i></div>
+                                <i className="fas fa-sad-tear fa-lg"></i></div>
                         )}
                     </ul>
                 </div>
